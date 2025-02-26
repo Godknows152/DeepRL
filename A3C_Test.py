@@ -55,4 +55,4 @@ def visualize_policy(model_path, env_name='CartPole-v1'):
 
 
 if __name__ == '__main__':
-    visualize_policy('best_model.pth')
+    visualize_policy('A3C_Model/best_model.pth')

@@ -135,7 +135,7 @@ if __name__ == '__main__':
                 current_reward = reward_queue.get()
                 if current_reward > best_reward:
                     best_reward = current_reward
-                    torch.save(global_net.state_dict(), 'best_model.pth')
+                    torch.save(global_net.state_dict(), 'A3C_Model/best_model.pth')
                     print(f"Saved best model with reward: {best_reward}")
     except KeyboardInterrupt:
         # 训练完成后按Ctrl+C退出
