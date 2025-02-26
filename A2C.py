@@ -10,7 +10,7 @@ from torch.nn.functional import mse_loss
 
 # A2C算法注意事项：1.A2C算法的A和C需要两个不同的神经网络（Actor 和 Critic）其参数最好不要共享
 # 2.采样时不需要采很长的序列，Agent到达目标就可以结束一个episode
-# 3.如果以Agent是否达到目标作为结束条件，容易出现Agent在地图中来回走的情况
+# 3.如果以Agent是否达到目标作为结束条件，容易出现Agent在地图中来回走的情况——已解决，添加了熵正则化
 
 class GridWorld:
     def __init__(self):
@@ -139,12 +139,13 @@ for episode in range(EPISODES):
     state = env.reset()
     done = False
     total_reward = 0
+    alpha = 0.3
     # 可视化
     actions = []
     states = []
     t = 0
 
-    while not done and t < 300:
+    while not done:
         # 保存状态
         states.append(state)
         # Normalize state
@@ -169,7 +170,10 @@ for episode in range(EPISODES):
         td_error = td_error.cuda(0)
 
         # Calculate losses
-        actor_loss = -dist.log_prob(action) * td_error.detach().cuda(0)
+        log_prob = dist.log_prob(action)
+        #熵正则项
+        entropy = dist.entropy().mean()
+        actor_loss = (-log_prob * td_error.detach() - alpha * entropy).cuda(0)
         critic_loss = mse_loss(value, td_target.detach()).cuda(0)
         loss = actor_loss + critic_loss
 
